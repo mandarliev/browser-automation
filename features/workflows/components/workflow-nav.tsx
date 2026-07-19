@@ -1,8 +1,6 @@
 "use client"
 
-import { useState } from "react"
-
-import { PlusIcon, Workflow } from "lucide-react"
+import { PlusIcon, Workflow as WorkflowIcon } from "lucide-react"
 
 import { Button } from "@/components/ui/button"
 import {
@@ -20,22 +18,22 @@ import {
   SidebarMenuItem,
   useSidebar,
 } from "@/components/ui/sidebar"
+import type { createWorkflowAction as CreateWorkflowAction } from "@/features/workflows/actions"
+import { generateSlug } from "@/features/workflows/lib/generate-slug"
+import type { Workflow } from "@/lib/db/schema"
 
-const workflows = [
-  "dominant-wasp",
-  "honest-reindeer",
-  "expected-llama",
-  "essential-ocelot",
-  "creepy-echidna",
-  "eastern-silkworm",
-  "cultural-lion",
-  "proud-weasel",
-  "regional-bonobo",
-]
-
-export function WorkflowNav() {
-  const [activeWorkflow, setActiveWorkflow] = useState(workflows[0])
+export function WorkflowNav({
+  workflows,
+  createWorkflowAction,
+}: {
+  workflows: Workflow[]
+  createWorkflowAction: typeof CreateWorkflowAction
+}) {
   const { state } = useSidebar()
+
+  function handleCreateWorkflow() {
+    createWorkflowAction(generateSlug())
+  }
 
   if (state === "collapsed") {
     return (
@@ -45,13 +43,14 @@ export function WorkflowNav() {
             <Popover>
               <PopoverTrigger asChild>
                 <SidebarMenuButton tooltip="Workflows">
-                  <Workflow />
+                  <WorkflowIcon />
                 </SidebarMenuButton>
               </PopoverTrigger>
               <PopoverContent side="right" align="start" className="w-56 p-1">
                 <Button
                   variant="ghost"
                   className="w-full justify-start gap-2"
+                  onClick={handleCreateWorkflow}
                 >
                   <PlusIcon />
                   New workflow
@@ -60,13 +59,11 @@ export function WorkflowNav() {
                 <div className="flex flex-col gap-0.5">
                   {workflows.map((workflow) => (
                     <Button
-                      key={workflow}
+                      key={workflow.id}
                       variant="ghost"
                       className="w-full justify-start"
-                      aria-current={workflow === activeWorkflow}
-                      onClick={() => setActiveWorkflow(workflow)}
                     >
-                      {workflow}
+                      {workflow.name}
                     </Button>
                   ))}
                 </div>
@@ -81,18 +78,15 @@ export function WorkflowNav() {
   return (
     <SidebarGroup>
       <SidebarGroupLabel>Workflows</SidebarGroupLabel>
-      <SidebarGroupAction title="New workflow">
+      <SidebarGroupAction title="New workflow" onClick={handleCreateWorkflow}>
         <PlusIcon />
         <span className="sr-only">New workflow</span>
       </SidebarGroupAction>
       <SidebarMenu className="gap-y-0.5">
         {workflows.map((workflow) => (
-          <SidebarMenuItem key={workflow}>
-            <SidebarMenuButton
-              isActive={workflow === activeWorkflow}
-              onClick={() => setActiveWorkflow(workflow)}
-            >
-              <span>{workflow}</span>
+          <SidebarMenuItem key={workflow.id}>
+            <SidebarMenuButton>
+              <span>{workflow.name}</span>
             </SidebarMenuButton>
           </SidebarMenuItem>
         ))}
