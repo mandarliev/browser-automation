@@ -1,0 +1,18 @@
+#!/bin/sh
+# Keeps package-lock.json in sync with Railway's npm version whenever
+# package.json changes are committed. See `lock:sync` in package.json.
+set -e
+
+if ! git diff --cached --name-only | grep -q '^package\.json$'; then
+  exit 0
+fi
+
+echo "package.json is staged — regenerating package-lock.json against Railway's Node version..."
+
+if ! docker info >/dev/null 2>&1; then
+  echo "ERROR: Docker isn't running. Start Docker Desktop, then run 'npm run lock:sync' and commit again." >&2
+  exit 1
+fi
+
+npm run lock:sync
+git add package-lock.json
