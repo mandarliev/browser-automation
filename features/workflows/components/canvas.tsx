@@ -1,31 +1,37 @@
 "use client"
 
-import { useCallback, useState, useSyncExternalStore } from "react"
+import { useCallback, useSyncExternalStore } from "react"
 import { useTheme } from "next-themes"
 import {
   addEdge,
-  applyEdgeChanges,
-  applyNodeChanges,
-  Background,
   Controls,
   MiniMap,
   ReactFlow,
   ConnectionLineType,
   type ColorMode,
   type Edge,
-  type Node,
-  type OnConnect,
-  type OnEdgesChange,
-  type OnNodesChange,
+  type Connection,
+  NodeTypes,
+  useNodesState,
+  useEdgesState,
 } from "@xyflow/react"
 import "@xyflow/react/dist/style.css"
 
-const initialNodes: Node[] = [
-  { id: "1", position: { x: 0, y: 0 }, data: { label: "Node 1" } },
-  { id: "2", position: { x: 0, y: 100 }, data: { label: "Node 2" } },
+import { StepNode } from "./step-node"
+import type { StepNodeType } from "../nodes/node-registry"
+
+const nodeTypes: NodeTypes = { step: StepNode }
+
+const initialNodes: StepNodeType[] = [
+  {
+    id: "start",
+    type: "step",
+    position: { x: 0, y: 0 },
+    data: { type: "start", kind: "trigger", title: "Start", values: {} },
+  },
 ]
 
-const initialEdges: Edge[] = [{ id: "1-2", source: "1", target: "2" }]
+const initialEdges: Edge[] = []
 
 function subscribeNoop() {
   return () => {}
@@ -40,32 +46,23 @@ function useMounted() {
 }
 
 export function Canvas() {
-  const mounted = useMounted()
   const { resolvedTheme } = useTheme()
+  const mounted = useMounted()
   const colorMode: ColorMode = mounted
     ? ((resolvedTheme as ColorMode) ?? "light")
     : "light"
-  const [nodes, setNodes] = useState(initialNodes)
-  const [edges, setEdges] = useState(initialEdges)
+  const [nodes, , onNodesChange] = useNodesState(initialNodes)
+  const [edges, setEdges, onEdgesChange] = useEdgesState(initialEdges)
 
-  const onNodesChange: OnNodesChange = useCallback(
-    (changes) => setNodes((current) => applyNodeChanges(changes, current)),
-    []
-  )
-
-  const onEdgesChange: OnEdgesChange = useCallback(
-    (changes) => setEdges((current) => applyEdgeChanges(changes, current)),
-    []
-  )
-
-  const onConnect: OnConnect = useCallback(
-    (connection) => setEdges((current) => addEdge(connection, current)),
-    []
+  const onConnect = useCallback(
+    (connection: Connection) => setEdges((eds) => addEdge(connection, eds)),
+    [setEdges]
   )
 
   return (
     <div className="size-full">
       <ReactFlow
+        nodeTypes={nodeTypes}
         nodes={nodes}
         edges={edges}
         onNodesChange={onNodesChange}

@@ -14,3 +14,7 @@ Derive database types from the Drizzle schema - never hand-write custom or parti
 
 This project has Trigger.dev agent skills installed in `.agents/skills/`. Before writing or changing Trigger.dev code (background tasks, scheduled tasks, realtime, or chat.agent AI agents), load the most relevant skill: `trigger-authoring-chat-agent`, `trigger-authoring-tasks`, `trigger-chat-agent-advanced`, `trigger-cost-savings`, `trigger-getting-started`, `trigger-realtime-and-frontend`.
 <!-- TRIGGER.DEV SKILLS END -->
+
+## ReactFlow (@xyflow/react)
+
+Never rely on training data for ReactFlow (`@xyflow/react`) APIs, components, hooks, or usage patterns — they change frequently across versions and training data is likely stale. Before writing or changing any ReactFlow code, fetch and read https://reactflow.dev/llms.txt for current, authoritative guidance.
