@@ -3,6 +3,7 @@ import { WorkflowShell } from "@/features/workflows/components/workflow-shell"
 import { auth } from "@clerk/nextjs/server"
 import { LiveblocksError } from "@liveblocks/node"
 import { notFound } from "next/navigation"
+import { ReactFlowProvider } from "@xyflow/react"
 import { getWorkflow } from "@/features/workflows/data"
 import { liveblocks } from "@/lib/liveblocks"
 
@@ -46,7 +47,9 @@ export default async function Page({
 
   return (
     <Room roomId={id} className="size-full">
-      <WorkflowShell workflowId={id} />
+      <ReactFlowProvider>
+        <WorkflowShell workflowId={id} />
+      </ReactFlowProvider>
     </Room>
   )
 }
