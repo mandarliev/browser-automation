@@ -1,3 +1,4 @@
+import { Room } from "@/features/workflows/components/room"
 import { WorkflowShell } from "@/features/workflows/components/workflow-shell"
 
 export default async function Page({
@@ -8,8 +9,8 @@ export default async function Page({
   const { id } = await params
 
   return (
-    <div className="size-full">
+    <Room roomId={id} className="size-full">
       <WorkflowShell workflowId={id} />
-    </div>
+    </Room>
   )
 }
